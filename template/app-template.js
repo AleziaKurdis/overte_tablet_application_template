@@ -18,6 +18,7 @@
     var APP_URL = ROOT + "template.html"; // <=== REPLACE VALUE (html page that will be your UI)
     var APP_ICON_INACTIVE = ROOT + "icon_template_inactive.png"; // <=== REPLACE VALUE (Provide a 50 X 50 pixels, .png or .svg file, WHITE on transparent background)
     var APP_ICON_ACTIVE = ROOT + "icon_template_active.png"; // <=== REPLACE VALUE  (Provide a 50 X 50 pixels, .png or .svg file, BLACK on transparent background)
+    var ICON_CAPTION_COLOR = "#FFFFFF"; //<=== If you want ot have a color icon (inactive one) instead of white, you can harmonize the caption color here.
     var appStatus = false;
     var channel = "overte.application.more.template"; // <=== REPLACE VALUE  (This must be a string specific to this application for a private communication between the app and its UI(html). The value must the same in template.html too.)
     var timestamp = 0;
@@ -30,24 +31,29 @@
     var button = tablet.addButton({
         text: APP_NAME,
         icon: APP_ICON_INACTIVE,
-        activeIcon: APP_ICON_ACTIVE
+        activeIcon: APP_ICON_ACTIVE,
+        captionColor: ICON_CAPTION_COLOR
     });
 
 
     function clicked(){
+        var colorCaption;
         if (appStatus === true) {
             tablet.webEventReceived.disconnect(onAppWebEventReceived);
             tablet.gotoHomeScreen();
+            colorCaption = ICON_CAPTION_COLOR;
             appStatus = false;
         }else{
             //Launching the Application UI.
             tablet.gotoWebScreen(APP_URL); // <== Data can be transmitted at opening of teh UI by using GET method, through paramater in the URL. + "?parameter=value"
             tablet.webEventReceived.connect(onAppWebEventReceived);
+            colorCaption = "#000000";
             appStatus = true;
         }
 
         button.editProperties({
-            isActive: appStatus
+            isActive: appStatus,
+            captionColor: colorCaption
         });
     }
 
@@ -95,17 +101,20 @@
 
     function onScreenChanged(type, url) {
         if (type === "Web" && url.indexOf(APP_URL) !== -1) {
+            colorCaption = "#000000";
             appStatus = true;
             //Here we know that the HTML UI is loaded.
             //We could communitate to it here as we know it is loaded.
             //testCallingTheUItoSendData();
 
         } else {
+            colorCaption = ICON_CAPTION_COLOR;
             appStatus = false;
         }
         
         button.editProperties({
-            isActive: appStatus
+            isActive: appStatus,
+            captionColor: colorCaption
         });
     }
 
